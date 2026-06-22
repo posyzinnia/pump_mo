@@ -219,7 +219,7 @@
         }
         .btn-group .btn { flex: 1; min-width: 100px; }
 
-        /* formula box */
+        /* formula box - ensure inline key lines stay on one line */
         .formula-box {
             border-radius: 10px;
             padding: 14px 16px;
@@ -234,9 +234,15 @@
             align-items: center;
             gap: 6px;
             font-size: 14px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding: 2px 0;
         }
-        .fval {
+        .formula-line::-webkit-scrollbar { display: none; }
+        .formula-line .fval {
+            flex-shrink: 0;
             background: rgba(27,77,53,0.1);
             border-radius: 6px;
             padding: 2px 8px;
@@ -244,9 +250,10 @@
             color: var(--green-dark);
             white-space: nowrap;
         }
-        .fval.orange { background: rgba(224,122,47,0.12); color: var(--orange); }
-        .fval.purple { background: rgba(107,63,160,0.12); color: var(--purple); }
-        .fval.result { background: var(--green-dark); color: #fff; padding: 3px 12px; }
+        .formula-line .fval.orange { background: rgba(224,122,47,0.12); color: var(--orange); }
+        .formula-line .fval.purple { background: rgba(107,63,160,0.12); color: var(--purple); }
+        .formula-line .fval.result { background: var(--green-dark); color: #fff; padding: 3px 12px; }
+        .formula-line .sep { flex-shrink: 0; opacity: 0.5; margin: 0 2px; }
 
         /* result box */
         .result-box {
@@ -331,26 +338,31 @@
         .grid-3 .card h3 { font-size: 14px; margin-bottom: 4px; }
         .grid-3 .result-value { font-size: 22px; }
 
-        /* pre formula */
+        /* pre formula - keep total head line inline */
         .pre-formula-grid {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            flex-wrap: nowrap;
+            gap: 6px;
             justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+            padding: 4px 0;
+            -webkit-overflow-scrolling: touch;
         }
+        .pre-formula-grid::-webkit-scrollbar { display: none; }
         .pre-formula-part {
-            flex: 1 1 100px;
+            flex: 0 0 auto;
             border-radius: 10px;
-            padding: 12px 8px;
+            padding: 10px 10px;
             text-align: center;
             min-width: 80px;
         }
         .part-green { background: var(--green-light); border: 2px solid var(--green-dark); }
         .part-orange { background: #fef0e6; border: 2px solid var(--orange); }
         .part-purple { background: #f0eaf8; border: 2px solid var(--purple); }
-        .pre-part-num { font-size: 22px; font-weight: 800; }
-        .pre-part-label { font-size: 12px; font-weight: 700; line-height: 1.3; }
-        .pre-formula-plus { font-size: 22px; font-weight: 800; color: var(--text-muted); }
+        .pre-part-num { font-size: 20px; font-weight: 800; }
+        .pre-part-label { font-size: 11px; font-weight: 700; line-height: 1.2; }
+        .pre-formula-plus { flex-shrink: 0; font-size: 20px; font-weight: 800; color: var(--text-muted); }
 
         /* alerts */
         .alert {
@@ -455,8 +467,10 @@
             .pump-cards-grid { grid-template-columns: 1fr 1fr; }
             .hero h1 { font-size: 22px; }
             .result-value { font-size: 30px; }
-            .pre-formula-part { flex: 1 1 80px; }
+            .pre-formula-part { min-width: 70px; padding: 8px 6px; }
+            .pre-part-label { font-size: 10px; }
             .sticky-nav a { font-size: 11px; padding: 4px 10px; }
+            .formula-line { font-size: 13px; }
         }
         @media (max-width: 380px) {
             .grid-3 { grid-template-columns: 1fr; }
@@ -540,6 +554,27 @@
             color: var(--green-dark);
             flex-wrap: wrap;
         }
+        /* keep total head line inline */
+        .total-head-line {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 4px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--green-dark);
+            overflow-x: auto;
+            padding: 4px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        .total-head-line::-webkit-scrollbar { display: none; }
+        .total-head-line .th-item {
+            flex-shrink: 0;
+            background: rgba(27,77,53,0.08);
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+        .total-head-line .th-plus { flex-shrink: 0; opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -570,12 +605,18 @@
             </div>
             <div class="card">
                 <div class="card-title"><span class="tag tag-blue">สูตรรวม</span> Head ทั้งหมด = 3 ส่วน</div>
-                <div class="pre-formula-grid">
-                    <div class="pre-formula-part part-green"><div class="pre-part-num">1</div><div class="pre-part-label">Head แนวดิ่ง</div></div>
-                    <div class="pre-formula-plus">+</div>
-                    <div class="pre-formula-part part-orange"><div class="pre-part-num">2</div><div class="pre-part-label">Head ท่อ</div></div>
-                    <div class="pre-formula-plus">+</div>
-                    <div class="pre-formula-part part-purple"><div class="pre-part-num">3</div><div class="pre-part-label">Head จ่ายน้ำ</div></div>
+                <!-- Total head line kept inline -->
+                <div class="total-head-line">
+                    <span class="th-item" style="background:#e8f4ec;color:#1b4d35;">Head แนวดิ่ง</span>
+                    <span class="th-plus">+</span>
+                    <span class="th-item" style="background:#fef0e6;color:#e07a2f;">Head ท่อ</span>
+                    <span class="th-plus">+</span>
+                    <span class="th-item" style="background:#f0eaf8;color:#6b3fa0;">Head จ่ายน้ำ</span>
+                    <span class="th-plus">=</span>
+                    <span class="th-item" style="background:#1b4d35;color:#fff;">Head รวม</span>
+                </div>
+                <div style="margin-top:8px;font-size:13px;color:var(--text-muted);text-align:center;">
+                    <i class="fas fa-arrow-right"></i> เลื่อนดูได้
                 </div>
             </div>
         </div>
@@ -720,6 +761,16 @@
             <!-- TOTAL -->
             <div class="card" style="border:2px solid var(--gold);background:linear-gradient(135deg,#FFFBE6,#FFF8CC);">
                 <div class="card-title"><i class="fas fa-crown" style="color:var(--gold);"></i> Head ทั้งหมด</div>
+                <!-- Keep total head line inline -->
+                <div class="total-head-line" style="justify-content:center;margin-bottom:12px;font-size:14px;">
+                    <span class="th-item" style="background:#e8f4ec;color:#1b4d35;">แนวตั้ง</span>
+                    <span class="th-plus">+</span>
+                    <span class="th-item" style="background:#fef0e6;color:#e07a2f;">ท่อ</span>
+                    <span class="th-plus">+</span>
+                    <span class="th-item" style="background:#f0eaf8;color:#6b3fa0;">จ่ายน้ำ</span>
+                    <span class="th-plus">=</span>
+                    <span class="th-item" style="background:#1b4d35;color:#fff;">Head รวม</span>
+                </div>
                 <button class="btn btn-primary" onclick="calculateTotalHead()" style="padding:14px;"><i class="fas fa-plus"></i> คำนวณ Head ทั้งหมด</button>
                 <div id="total-result" style="display:none;margin-top:14px;">
                     <div class="summary-box">
