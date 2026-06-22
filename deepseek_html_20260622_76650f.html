@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>เครื่องคำนวณ Head ปั๊ม | KasetInno</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green-dark: #1b4d35; --green-mid: #2e7d52; --green-light: #e8f4ec;
+            --gold: #f5c842; --orange: #e07a2f; --purple: #6b3fa0;
+            --bg: #f5f5f2; --card-bg: #ffffff; --text: #1a1a1a; --text-muted: #4a5a4e;
+            --radius: 14px; --shadow: 0 3px 14px rgba(27,77,53,0.08);
+        }
+        body {
+            font-family: "Sarabun", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            font-size: 15px;
+            padding: 0 0 20px 0;
+        }
+        .container { max-width: 500px; margin: 0 auto; padding: 0 12px; }
+        /* hero */
+        .hero {
+            background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+            color: #fff;
+            padding: 20px 16px 28px;
+            text-align: center;
+            border-radius: 0 0 24px 24px;
+            margin-bottom: 12px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--green-dark);
+            font-weight: 700;
+            font-size: 11px;
+            padding: 2px 14px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .hero h1 {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .hero h1 span { color: var(--gold); }
+        .hero-logo { max-width: 120px; margin-top: 8px; }
+
+        /* sticky nav - mobile first scrollable */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--green-dark);
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-wrap: nowrap;
+            gap: 6px;
+            padding: 8px 12px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-nav::-webkit-scrollbar { display: none; }
+        .sticky-nav a {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 99px;
+            transition: 0.2s;
+        }
+        .sticky-nav a.active {
+            background: var(--gold);
+            color: var(--green-dark);
+        }
+        .sticky-nav a:hover { background: rgba(255,255,255,0.12); color:#fff; }
+
+        /* section */
+        .section { padding: 18px 0; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .section-num {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            flex-shrink: 0;
+            color:#fff;
+        }
+        .num-green { background: var(--green-dark); }
+        .num-orange { background: var(--orange); }
+        .num-purple { background: var(--purple); }
+        .num-blue { background: #1f5db8; }
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--green-dark);
+        }
+        .section-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 0;
+        }
+
+        /* cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px 14px;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .tag-green { background: var(--green-light); color: var(--green-dark); }
+        .tag-orange { background: #fef0e6; color: var(--orange); }
+        .tag-purple { background: #f0eaf8; color: var(--purple); }
+        .tag-blue { background: #e8f0fe; color: #1f5db8; }
+
+        /* inputs - mobile friendly */
+        .input-group { margin-bottom: 14px; }
+        .input-label {
+            display: block;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .input-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .input-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-wrapper input, .input-wrapper select {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e0e8e4;
+            border-radius: 8px;
+            font-family: "Sarabun", sans-serif;
+            font-size: 15px;
+            background: #fff;
+            width: 100%;
+            min-width: 0;
+        }
+        .input-unit {
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 10px 12px;
+            background: var(--green-light);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: "Sarabun", sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+        .btn-primary { background: var(--green-dark); color: #fff; }
+        .btn-primary:hover { background: var(--green-mid); }
+        .btn-secondary { background: var(--green-light); color: var(--green-dark); }
+
+        .btn-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .btn-group .btn { flex: 1; min-width: 100px; }
+
+        /* formula box */
+        .formula-box {
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .formula-box.green { background: var(--green-light); border-left: 4px solid var(--green-dark); }
+        .formula-box.orange { background: #fef0e6; border-left: 4px solid var(--orange); }
+        .formula-box.purple { background: #f0eaf8; border-left: 4px solid var(--purple); }
+        .formula-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            flex-wrap: wrap;
+        }
+        .fval {
+            background: rgba(27,77,53,0.1);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 700;
+            color: var(--green-dark);
+            white-space: nowrap;
+        }
+        .fval.orange { background: rgba(224,122,47,0.12); color: var(--orange); }
+        .fval.purple { background: rgba(107,63,160,0.12); color: var(--purple); }
+        .fval.result { background: var(--green-dark); color: #fff; padding: 3px 12px; }
+
+        /* result box */
+        .result-box {
+            background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 14px;
+            text-align: center;
+        }
+        .result-box h3 { font-size: 16px; opacity: 0.9; margin-bottom: 4px; }
+        .result-value { font-size: 38px; font-weight: 800; line-height: 1.1; }
+        .result-unit { font-size: 14px; opacity: 0.8; }
+
+        /* pump tabs */
+        .pump-tabs, .zone-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .pump-tab, .zone-tab {
+            padding: 8px 14px;
+            border-radius: 99px;
+            border: 2px solid transparent;
+            font-family: "Sarabun", sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--green-light);
+            color: var(--green-dark);
+            flex: 1 1 auto;
+            min-width: 80px;
+            text-align: center;
+        }
+        .pump-tab.active, .zone-tab.active {
+            background: var(--green-dark);
+            color: #fff;
+        }
+        .pump-content, .zone-tab-content { display: none; }
+        .pump-content.active, .zone-tab-content.active { display: block; animation: fade 0.25s; }
+        @keyframes fade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        /* steps */
+        .steps { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .step { display: flex; gap: 10px; align-items: flex-start; }
+        .step-dot {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+            color: #fff;
+        }
+        .dot-green { background: var(--green-dark); }
+        .step p { font-size: 14px; margin: 0; }
+
+        /* tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #dde8e0;
+            padding: 8px 6px;
+            text-align: center;
+        }
+        .data-table th { background: var(--green-dark); color: #fff; font-weight: 700; }
+
+        /* grid */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .grid-3 .card { padding: 12px; text-align: center; }
+        .grid-3 .card h3 { font-size: 14px; margin-bottom: 4px; }
+        .grid-3 .result-value { font-size: 22px; }
+
+        /* pre formula */
+        .pre-formula-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .pre-formula-part {
+            flex: 1 1 100px;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            min-width: 80px;
+        }
+        .part-green { background: var(--green-light); border: 2px solid var(--green-dark); }
+        .part-orange { background: #fef0e6; border: 2px solid var(--orange); }
+        .part-purple { background: #f0eaf8; border: 2px solid var(--purple); }
+        .pre-part-num { font-size: 22px; font-weight: 800; }
+        .pre-part-label { font-size: 12px; font-weight: 700; line-height: 1.3; }
+        .pre-formula-plus { font-size: 22px; font-weight: 800; color: var(--text-muted); }
+
+        /* alerts */
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .alert-info { background: #e3f2fd; color: #1565c0; border-left: 4px solid #1565c0; }
+        .alert-success { background: var(--green-light); color: var(--green-dark); border-left: 4px solid var(--green-dark); }
+        .alert i { font-size: 18px; }
+
+        /* summary */
+        .summary-box {
+            background: var(--green-light);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(27,77,53,0.08);
+        }
+        .summary-total {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--green-dark);
+            padding-top: 10px;
+            border-top: 2px solid var(--green-dark);
+            margin-top: 6px;
+        }
+
+        /* pump cards */
+        .pump-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .pump-model-card {
+            background: #fff;
+            border: 2px solid #d4e8db;
+            border-radius: 12px;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .pump-model-card.selected { border-color: var(--green-dark); background: var(--green-light); }
+        .pump-card-img {
+            width: 100%;
+            height: 90px;
+            object-fit: contain;
+            background: #f5f9f6;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+        .pump-card-name { font-size: 13px; font-weight: 800; color: var(--green-dark); margin-bottom: 4px; }
+        .pump-card-stat { font-size: 11px; display: flex; justify-content: space-between; }
+        .pump-card-flow-badge {
+            background: var(--green-dark);
+            color: #fff;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        .pump-card-flow-badge-orange {
+            background: var(--orange);
+            color: #fff;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* footer */
+        footer {
+            background: var(--green-dark);
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            padding: 24px 16px;
+            font-size: 13px;
+            border-radius: 20px 20px 0 0;
+            margin-top: 16px;
+        }
+        footer strong { color: var(--gold); display: block; font-size: 18px; }
+        footer a { color: var(--gold); text-decoration: none; }
+
+        /* mobile tweaks */
+        @media (max-width: 480px) {
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+            .pump-cards-grid { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 22px; }
+            .result-value { font-size: 30px; }
+            .pre-formula-part { flex: 1 1 80px; }
+            .sticky-nav a { font-size: 11px; padding: 4px 10px; }
+        }
+        @media (max-width: 380px) {
+            .grid-3 { grid-template-columns: 1fr; }
+            .pump-cards-grid { grid-template-columns: 1fr; }
+        }
+
+        .divider { border: none; border-top: 2px dashed #d4e8db; margin: 20px 0; }
+        .zone-result-box {
+            background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+            color: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .zone-result-box .z-value { font-size: 32px; font-weight: 800; }
+        .zone-inline-result {
+            background: var(--green-light);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-top: 6px;
+            display: none;
+        }
+        .pump-info-panel {
+            margin-top: 14px;
+            border: 2px solid #d4e8db;
+            border-radius: var(--radius);
+            background: #fff;
+            padding: 14px;
+        }
+        .pump-info-img { max-width: 100%; height: auto; border-radius: 8px; }
+        .pump-info-name { font-size: 16px; font-weight: 800; color: var(--green-dark); }
+        .pump-parts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .part-item {
+            background: #f5f9f6;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+        .part-item-code { font-weight: 700; color: var(--green-dark); }
+        .pump-parts-total-row {
+            display: flex;
+            justify-content: space-between;
+            background: var(--green-dark);
+            color: #fff;
+            border-radius: 8px;
+            padding: 8px 14px;
+            margin-top: 8px;
+            font-weight: 700;
+        }
+        .pump-flow-result {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 700;
+        }
+        .pump-flow-result.ok { background: var(--green-light); border: 2px solid var(--green-dark); }
+        .pump-flow-result.warn { background: #fef0e6; border: 2px solid var(--orange); }
+        .flow-num { font-size: 28px; display: block; }
+        .zone-calc-section { margin-top: 16px; }
+        .zone-step-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin: 10px 0 4px; }
+        .formula-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--green-light);
+            border: 1.5px solid var(--green-dark);
+            border-radius: 99px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-dark);
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-badge">🌾 KasetInno เกษตรอินโน</div>
+        <h1>เครื่องคำนวณ <span>Head ปั๊ม</span></h1>
+        <img src="./image/logo.png" alt="KasetInno logo" class="hero-logo" onerror="this.style.display='none'">
+    </header>
+
+    <nav class="sticky-nav" id="stickyNav">
+        <a href="#pre" class="nav-link active" data-section="pre">📖 Head</a>
+        <a href="#part1" class="nav-link" data-section="part1">1️⃣ แนวดิ่ง</a>
+        <a href="#part2" class="nav-link" data-section="part2">2️⃣ ท่อ</a>
+        <a href="#part3" class="nav-link" data-section="part3">3️⃣ จ่ายน้ำ</a>
+        <a href="#calculator" class="nav-link" data-section="calculator">🧮 คำนวณ</a>
+    </nav>
+
+    <!-- PRE -->
+    <section class="section" id="pre">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-num num-blue">📖</div>
+                <div><h2>Head ปั๊ม คืออะไร?</h2></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="tag tag-blue">ความหมาย</span> Head ปั๊ม (Pump Head)</div>
+                <p style="font-size:14px;color:var(--text-muted);line-height:1.6;"><strong>Head</strong> คือค่าที่บอกว่าปั๊มต้องออกแรงมากแค่ไหน ส่งน้ำจากต้นทางถึงปลายทาง หน่วย <strong>เมตร (m)</strong> — ยิ่ง Head สูง ปั๊มต้องแรงมากขึ้น</p>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="tag tag-blue">สูตรรวม</span> Head ทั้งหมด = 3 ส่วน</div>
+                <div class="pre-formula-grid">
+                    <div class="pre-formula-part part-green"><div class="pre-part-num">1</div><div class="pre-part-label">Head แนวดิ่ง</div></div>
+                    <div class="pre-formula-plus">+</div>
+                    <div class="pre-formula-part part-orange"><div class="pre-part-num">2</div><div class="pre-part-label">Head ท่อ</div></div>
+                    <div class="pre-formula-plus">+</div>
+                    <div class="pre-formula-part part-purple"><div class="pre-part-num">3</div><div class="pre-part-label">Head จ่ายน้ำ</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- PART 1 -->
+    <section class="section" id="part1">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-num num-green">1</div>
+                <div><h2>Head แนวดิ่ง</h2><p>ตามประเภทปั๊ม</p></div>
+            </div>
+            <div class="pump-tabs">
+                <button class="pump-tab active" onclick="switchPump('borehole', this)">🔩 บาดาล</button>
+                <button class="pump-tab" onclick="switchPump('centrifugal', this)">⚙️ หอยโข่ง</button>
+            </div>
+            <div class="pump-content active" id="pump-borehole">
+                <div class="card">
+                    <div class="card-title"><span class="tag tag-green">ปั๊มบาดาล</span> สูตร</div>
+                    <div class="formula-box green"><div class="formula-line"><strong>Head = ระยะสูบ(20ม.) + ระดับน้ำปากบ่อ + ความสูงส่ง</strong></div></div>
+                    <div class="steps">
+                        <div class="step"><div class="step-dot dot-green">1</div><p><strong>ระยะสูบ:</strong> 20 เมตร</p></div>
+                        <div class="step"><div class="step-dot dot-green">2</div><p><strong>ระดับน้ำปากบ่อ:</strong> ผิวน้ำถึงปากบ่อ (ม.)</p></div>
+                        <div class="step"><div class="step-dot dot-green">3</div><p><strong>ความสูงส่ง:</strong> พื้นดินถึงจุดจ่าย (ม.)</p></div>
+                    </div>
+                    <div style="margin-top:10px;padding:12px;background:#E8F4EC;border-radius:8px;font-size:13px;">
+                        <strong>💡 ความสูงจากท่อเอียง:</strong> ความสูง = ยาว × sin(มุม)
+                    </div>
+                </div>
+            </div>
+            <div class="pump-content" id="pump-centrifugal">
+                <div class="card">
+                    <div class="card-title"><span class="tag tag-green">ปั๊มหอยโข่ง</span> สูตร</div>
+                    <div class="formula-box green"><div class="formula-line"><strong>Head = ระดับน้ำปากบ่อ + ความสูงส่ง</strong></div></div>
+                    <div class="steps">
+                        <div class="step"><div class="step-dot dot-green">1</div><p><strong>ระดับน้ำปากบ่อ:</strong> ผิวน้ำถึงปั๊ม (ม.)</p></div>
+                        <div class="step"><div class="step-dot dot-green">2</div><p><strong>ความสูงส่ง:</strong> สูงที่ส่งน้ำไป (ม.)</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- PART 2 -->
+    <section class="section" id="part2">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-num num-orange">2</div>
+                <div><h2>Head จากท่อ</h2><p>ห้ามลดขนาดท่อ</p></div>
+            </div>
+            <div class="card">
+                <div class="formula-box orange"><strong>Head ท่อ = ความยาวท่อทั้งหมด ÷ ค่าคงที่</strong></div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead><tr><th>ขนาดท่อ</th><th>ค่าคงที่</th><th>Head</th></tr></thead>
+                        <tbody>
+                            <tr><td>1.5 นิ้ว</td><td>15</td><td>ยาว÷15</td></tr>
+                            <tr><td>2 นิ้ว</td><td>20</td><td>ยาว÷20</td></tr>
+                            <tr><td>3 นิ้ว</td><td>30</td><td>ยาว÷30</td></tr>
+                            <tr><td>4 นิ้ว</td><td>40</td><td>ยาว÷40</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- PART 3 -->
+    <section class="section" id="part3">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-num num-purple">3</div>
+                <div><h2>Head รูปแบบจ่ายน้ำ</h2><p>3 รูปแบบ</p></div>
+            </div>
+            <div class="grid-3">
+                <div class="card" style="border-top:4px solid var(--green-dark);"><h3 style="color:var(--green-dark);">ปากท่อ PVC</h3><div class="result-value" style="color:var(--green-dark);">0 ม.</div></div>
+                <div class="card" style="border-top:4px solid var(--orange);"><h3 style="color:var(--orange);">หัวน้ำหยด</h3><div class="result-value" style="color:var(--orange);">5 ม.</div></div>
+                <div class="card" style="border-top:4px solid var(--purple);"><h3 style="color:var(--purple);">สปริงเกอร์</h3><div class="result-value" style="color:var(--purple);">10 ม.</div></div>
+            </div>
+            <div class="alert alert-info"><i class="fas fa-lightbulb"></i><div><strong>แรงดันใช้งาน:</strong> ค้นหาใน Google หรือ ChatGPT</div></div>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- CALCULATOR -->
+    <section class="section" id="calculator">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-num num-green">🧮</div>
+                <div><h2>เครื่องคำนวณ Head</h2></div>
+            </div>
+
+            <!-- PART 1 CALC -->
+            <div class="card">
+                <div class="card-title"><span class="tag tag-green">ส่วนที่ 1</span> Head แนวดิ่ง</div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="selectPumpType('borehole')" id="btn-borehole">🔩 บาดาล</button>
+                    <button class="btn btn-secondary" onclick="selectPumpType('centrifugal')" id="btn-centrifugal">⚙️ หอยโข่ง</button>
+                </div>
+                <div id="calc-borehole">
+                    <div class="input-group"><label class="input-label">ระยะสูบน้ำ <span style="color:red;">20 ม.</span></label><div class="input-wrapper"><input type="number" id="bore-depth" placeholder="20" min="0" step="0.1" value="20"><div class="input-unit">ม.</div></div></div>
+                    <div class="input-group"><label class="input-label">ระดับน้ำปากบ่อ</label><div class="input-wrapper"><input type="number" id="bore-water-level" placeholder="10" min="0" step="0.1"><div class="input-unit">ม.</div></div></div>
+                    <div class="input-group"><label class="input-label">ความสูงส่งจากพื้นดิน</label><div class="input-wrapper"><input type="number" id="bore-delivery-height" placeholder="16" min="0" step="0.1"><div class="input-unit">ม.</div></div></div>
+                    <button class="btn btn-primary" onclick="calculateBorehead()"><i class="fas fa-calculator"></i> คำนวณ</button>
+                    <div id="bore-result" style="display:none;margin-top:12px;"><div class="result-box"><h3>Head แนวดิ่ง (บาดาล)</h3><div class="result-value" id="bore-result-value">0</div><div class="result-unit">เมตร</div></div></div>
+                </div>
+                <div id="calc-centrifugal" style="display:none;">
+                    <div class="input-group"><label class="input-label">ระดับน้ำปากบ่อ</label><div class="input-wrapper"><input type="number" id="cent-suction-depth" placeholder="4" min="0" step="0.1"><div class="input-unit">ม.</div></div></div>
+                    <div class="input-group"><label class="input-label">ความสูงส่ง</label><div class="input-wrapper"><input type="number" id="cent-delivery-height" placeholder="2" min="0" step="0.1"><div class="input-unit">ม.</div></div></div>
+                    <button class="btn btn-primary" onclick="calculateCenthead()"><i class="fas fa-calculator"></i> คำนวณ</button>
+                    <div id="cent-result" style="display:none;margin-top:12px;"><div class="result-box"><h3>Head แนวดิ่ง (หอยโข่ง)</h3><div class="result-value" id="cent-result-value">0</div><div class="result-unit">เมตร</div></div></div>
+                </div>
+            </div>
+
+            <!-- PART 2 CALC -->
+            <div class="card">
+                <div class="card-title"><span class="tag tag-orange">ส่วนที่ 2</span> Head ท่อ</div>
+                <div class="input-group"><label class="input-label">ความยาวท่อทั้งหมด</label><div class="input-wrapper"><input type="number" id="pipe-length" placeholder="24" min="0" step="0.1"><div class="input-unit">ม.</div></div></div>
+                <div class="input-group"><label class="input-label">ขนาดท่อส่ง</label><select id="pipe-size"><option value="">-- เลือก --</option><option value="1.5">1.5 นิ้ว</option><option value="2">2 นิ้ว</option><option value="3">3 นิ้ว</option><option value="4">4 นิ้ว</option></select></div>
+                <button class="btn btn-primary" onclick="calculatePipeHead()"><i class="fas fa-calculator"></i> คำนวณ</button>
+                <div id="pipe-result" style="display:none;margin-top:12px;"><div class="result-box"><h3>Head ท่อ</h3><div class="result-value" id="pipe-result-value">0</div><div class="result-unit">เมตร</div></div></div>
+            </div>
+
+            <!-- PART 3 CALC -->
+            <div class="card">
+                <div class="card-title"><span class="tag tag-purple">ส่วนที่ 3</span> Head จ่ายน้ำ</div>
+                <div class="input-group"><label class="input-label">รูปแบบจ่ายน้ำ</label><select id="delivery-type" onchange="updateDeliveryHead()"><option value="">-- เลือก --</option><option value="0">ปากท่อ PVC</option><option value="manual">หัวน้ำหยด</option><option value="sprinkler">สปริงเกอร์</option></select></div>
+                <div id="pressure-input" style="display:none;">
+                    <div class="input-group"><label class="input-label">แรงดันใช้งาน (บาร์)</label><div class="input-wrapper"><input type="number" id="delivery-pressure" placeholder="0.5" min="0" step="0.1"><div class="input-unit">บาร์</div></div></div>
+                    <button class="btn btn-primary" onclick="calculateDeliveryHead()"><i class="fas fa-calculator"></i> คำนวณ</button>
+                </div>
+                <div id="delivery-result" style="display:none;margin-top:12px;"><div class="result-box"><h3>Head จ่ายน้ำ</h3><div class="result-value" id="delivery-result-value">0</div><div class="result-unit">เมตร</div></div></div>
+            </div>
+
+            <!-- TOTAL -->
+            <div class="card" style="border:2px solid var(--gold);background:linear-gradient(135deg,#FFFBE6,#FFF8CC);">
+                <div class="card-title"><i class="fas fa-crown" style="color:var(--gold);"></i> Head ทั้งหมด</div>
+                <button class="btn btn-primary" onclick="calculateTotalHead()" style="padding:14px;"><i class="fas fa-plus"></i> คำนวณ Head ทั้งหมด</button>
+                <div id="total-result" style="display:none;margin-top:14px;">
+                    <div class="summary-box">
+                        <div class="summary-item"><strong>Head แนวดิ่ง:</strong><span id="summary-vertical">0 ม.</span></div>
+                        <div class="summary-item"><strong>Head ท่อ:</strong><span id="summary-pipe">0 ม.</span></div>
+                        <div class="summary-item"><strong>Head จ่ายน้ำ:</strong><span id="summary-delivery">0 ม.</span></div>
+                        <div class="summary-total">Head ทั้งหมด = <span id="summary-total">0</span> เมตร</div>
+                    </div>
+                    <div class="alert alert-success"><i class="fas fa-check-circle"></i><div><strong>เลือกปั๊ม:</strong> Head Max ≥ <span id="recommended-head">0</span> ม. (70% rule)</div></div>
+                </div>
+            </div>
+
+            <!-- PUMP SELECTION -->
+            <div class="card" id="pump-select-card" style="display:none;border:2px solid var(--gold);background:linear-gradient(135deg,#FFFBE6,#FFF8CC);">
+                <div class="card-title"><i class="fas fa-tint" style="color:var(--gold);"></i> รุ่นปั๊มที่แนะนำ</div>
+                <div id="pump-cards-grid" class="pump-cards-grid"></div>
+                <div id="pump-curve-canvas-wrapper" style="display:none;margin-top:12px;">
+                    <canvas id="pumpCurveChart" height="200"></canvas>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:6px;">
+                        <span><span style="display:inline-block;width:14px;height:3px;background:#1B4D35;border-radius:2px;"></span> เส้นโค้ง</span>
+                        <span><span style="display:inline-block;width:14px;height:3px;background:#E07A2F;border-radius:2px;border-top:2px dashed #E07A2F;"></span> Head ที่ต้องการ</span>
+                        <span><span style="display:inline-block;width:12px;height:12px;background:#F5C842;border-radius:50%;"></span> จุดทำงาน</span>
+                    </div>
+                </div>
+                <div id="pump-flow-result" class="pump-flow-result" style="display:none;"></div>
+                <!-- Zone calc -->
+                <div id="zone-calc-section" class="zone-calc-section" style="display:none;margin-top:14px;">
+                    <div class="zone-calc-title"><i class="fas fa-seedling" style="color:var(--green-dark);"></i> วางแผนโซนจ่ายน้ำ</div>
+                    <div class="zone-tabs">
+                        <button class="zone-tab active" onclick="switchZoneTab('dripper', this)">💧 หัวน้ำหยด</button>
+                        <button class="zone-tab" onclick="switchZoneTab('sprinkler', this)">🌀 สปริงเกอร์</button>
+                    </div>
+                    <div id="zone-tab-dripper" class="zone-tab-content active">
+                        <p style="font-size:13px;color:var(--text-muted);">ใช้ 6 คิว/ชม ต่อไร่</p>
+                        <div class="zone-step-label">ขั้นที่ 1 — ไร่ที่ปั๊มทำงานได้</div>
+                        <div class="formula-pill">ไร่ = อัตราการไหล (คิว/ชม) ÷ 6</div>
+                        <div class="zone-inline-result" id="dripper-rai-result"></div>
+                        <div class="zone-step-label">ขั้นที่ 2 — แบ่งโซน</div>
+                        <div class="input-group"><label class="input-label">จำนวนไร่ทั้งหมด</label><div class="input-wrapper"><input type="number" id="dripper-total-rai" placeholder="10" min="0" step="0.5" oninput="calcDripperZone()"><div class="input-unit">ไร่</div></div></div>
+                        <div id="dripper-zone-result" class="zone-result-box" style="display:none;"><div class="z-label">จำนวนโซน</div><div class="z-value" id="dripper-zone-value">—</div><div class="z-note" id="dripper-zone-note"></div></div>
+                    </div>
+                    <div id="zone-tab-sprinkler" class="zone-tab-content">
+                        <div class="zone-step-label">ปริมาณน้ำต่อหัว (L/H → คิว/ชม)</div>
+                        <div class="input-group"><label class="input-label">L/H ต่อหัว</label><div class="input-wrapper"><input type="number" id="sprinkler-lph" placeholder="120" min="0" step="1" oninput="calcSprinklerZone()"><div class="input-unit">L/H</div></div></div>
+                        <div class="zone-inline-result" id="sprinkler-cms-result"></div>
+                        <div class="zone-step-label">จำนวนหัวที่ปั๊มทำงานได้</div>
+                        <div class="zone-inline-result" id="sprinkler-heads-result"></div>
+                        <div class="zone-step-label">แบ่งโซน</div>
+                        <div class="input-group"><label class="input-label">จำนวนหัวทั้งหมด</label><div class="input-wrapper"><input type="number" id="sprinkler-total-heads" placeholder="50" min="0" step="1" oninput="calcSprinklerZone()"><div class="input-unit">หัว</div></div></div>
+                        <div id="sprinkler-zone-result" class="zone-result-box" style="display:none;"><div class="z-label">จำนวนโซน</div><div class="z-value" id="sprinkler-zone-value">—</div><div class="z-note" id="sprinkler-zone-note"></div></div>
+                    </div>
+                </div>
+                <!-- Pump info panel -->
+                <div id="pump-info-panel" class="pump-info-panel" style="display:none;margin-top:14px;">
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <img id="pump-info-img" src="" alt="pump" style="max-width:100%;border-radius:8px;">
+                        <div class="pump-info-name" id="pump-info-name"></div>
+                        <div id="pump-info-type-badge"></div>
+                        <div class="pump-parts-grid" id="pump-parts-grid"></div>
+                        <div class="pump-parts-total-row"><span>ราคารวม</span><span id="pump-parts-total">—</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <strong>🌿 KasetInno เกษตรอินโน</strong>
+        <p>ระบบน้ำการเกษตร</p>
+        <p>ติดต่อ: <a href="tel:020256936">📱 02-025-6936</a></p>
+        <p style="opacity:0.6;font-size:12px;">© 2026 KasetInno</p>
+    </footer>
+
+    <script src="./data/pump_data.js" defer></script>
+    <script>
+        // ---- script.js content adapted for mobile ----
+        let state = { pumpType: "borehole", verticalHead: 0, pipeHead: 0, deliveryHead: 0, deliveryType: "", selectedPump: null, pumpFlow: 0 };
+        let pumpChart = null;
+
+        function switchPump(type, btn) {
+            document.querySelectorAll('.pump-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.pump-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('pump-'+type).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function selectPumpType(type) {
+            state.pumpType = type;
+            const b = document.getElementById('btn-borehole'), c = document.getElementById('btn-centrifugal');
+            if(type==='borehole') {
+                b.className='btn btn-primary'; c.className='btn btn-secondary';
+                document.getElementById('calc-borehole').style.display='block';
+                document.getElementById('calc-centrifugal').style.display='none';
+            } else {
+                c.className='btn btn-primary'; b.className='btn btn-secondary';
+                document.getElementById('calc-centrifugal').style.display='block';
+                document.getElementById('calc-borehole').style.display='none';
+            }
+        }
+
+        function calculateBorehead() {
+            const d=parseFloat(document.getElementById('bore-depth').value)||0;
+            const w=parseFloat(document.getElementById('bore-water-level').value)||0;
+            const h=parseFloat(document.getElementById('bore-delivery-height').value)||0;
+            const head=d+w+h; state.verticalHead=head;
+            document.getElementById('bore-result').style.display='block';
+            document.getElementById('bore-result-value').textContent=head.toFixed(2);
+        }
+
+        function calculateCenthead() {
+            const s=parseFloat(document.getElementById('cent-suction-depth').value)||0;
+            const h=parseFloat(document.getElementById('cent-delivery-height').value)||0;
+            const head=s+h; state.verticalHead=head;
+            document.getElementById('cent-result').style.display='block';
+            document.getElementById('cent-result-value').textContent=head.toFixed(2);
+        }
+
+        function calculatePipeHead() {
+            const len=parseFloat(document.getElementById('pipe-length').value)||0;
+            const sz=document.getElementById('pipe-size').value;
+            if(!sz){alert('เลือกขนาดท่อ');return;}
+            const divs={1.5:15,2:20,3:30,4:40};
+            const head=len/divs[sz]; state.pipeHead=head;
+            document.getElementById('pipe-result').style.display='block';
+            document.getElementById('pipe-result-value').textContent=head.toFixed(2);
+        }
+
+        function updateDeliveryHead() {
+            const type=document.getElementById('delivery-type').value;
+            state.deliveryType=type;
+            if(type==='0'){ state.deliveryHead=0; document.getElementById('pressure-input').style.display='none'; document.getElementById('delivery-result').style.display='none'; }
+            else if(type==='manual'||type==='sprinkler'){ document.getElementById('pressure-input').style.display='block'; document.getElementById('delivery-result').style.display='none'; }
+        }
+
+        function calculateDeliveryHead() {
+            const p=parseFloat(document.getElementById('delivery-pressure').value)||0;
+            const head=p*10; state.deliveryHead=head;
+            document.getElementById('delivery-result').style.display='block';
+            document.getElementById('delivery-result-value').textContent=head.toFixed(2);
+        }
+
+        function calculateTotalHead() {
+            const vert=state.verticalHead||0, pipe=state.pipeHead||0, deliv=state.deliveryHead||0;
+            const total=vert+pipe+deliv, rec=(total*1.43).toFixed(2);
+            document.getElementById('total-result').style.display='block';
+            document.getElementById('summary-vertical').textContent=vert.toFixed(2)+' ม.';
+            document.getElementById('summary-pipe').textContent=pipe.toFixed(2)+' ม.';
+            document.getElementById('summary-delivery').textContent=deliv.toFixed(2)+' ม.';
+            document.getElementById('summary-total').textContent=total.toFixed(2);
+            document.getElementById('recommended-head').textContent=rec;
+            renderPumpCards(total);
+            document.getElementById('pump-select-card').style.display='block';
+        }
+
+        function renderPumpCards(totalHead) {
+            const grid=document.getElementById('pump-cards-grid'); grid.innerHTML='';
+            document.getElementById('pump-curve-canvas-wrapper').style.display='none';
+            document.getElementById('pump-flow-result').style.display='none';
+            document.getElementById('pump-info-panel').style.display='none';
+            if(pumpChart){ pumpChart.destroy(); pumpChart=null; }
+            state.selectedPump=null;
+            const activeType=state.pumpType;
+            let count=0;
+            if(typeof PUMP_DATA==='undefined'){ grid.innerHTML='<p>กรุณาโหลดข้อมูลปั๊ม</p>'; return; }
+            Object.entries(PUMP_DATA).forEach(([name,data])=>{
+                if(data.type!==activeType) return;
+                const maxHead=Math.max(...data.head);
+                if(maxHead<totalHead) return;
+                const estFlow=getFlowAtHead(name,totalHead);
+                count++;
+                const card=document.createElement('div');
+                card.className='pump-model-card';
+                card.dataset.pump=name;
+                card.innerHTML=`
+                    <img class="pump-card-img" src="${data.image}" alt="${name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%2280%22%3E%3Crect fill=%22%23f5f9f6%22 width=%22100%25%22 height=%22100%25%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 fill=%22%23aaa%22 font-size=%2211%22%3Eไม่พบรูป%3C/text%3E%3C/svg%3E'">
+                    <div class="pump-card-name">${name}</div>
+                    <div class="pump-card-stat"><span>รหัส</span><strong>${data.power}</strong></div>
+                    <div class="pump-card-stat"><span>ท่อ</span><strong>${data.po}</strong></div>
+                    <div class="pump-card-flow-badge">≈ ${estFlow!==null?estFlow.toFixed(2)+' คิว/ชม':'-'}</div>
+                    <div class="pump-card-flow-badge-orange">${Number(data.price).toLocaleString()} บาท</div>
+                `;
+                card.addEventListener('click',()=>selectPumpCard(name,card));
+                grid.appendChild(card);
+            });
+            if(count===0) grid.innerHTML='<p style="color:var(--orange);font-weight:700;font-size:14px;">⚠️ ไม่มีปั๊มที่รองรับ Head '+totalHead.toFixed(1)+' ม.</p>';
+        }
+
+        function getFlowAtHead(pumpName,targetHead) {
+            const data=PUMP_DATA[pumpName]; if(!data) return null;
+            const heads=data.head, flows=data.flow;
+            const maxHead=Math.max(...heads);
+            if(targetHead>maxHead) return null;
+            if(targetHead<=0) return Math.max(...flows);
+            for(let i=0;i<heads.length-1;i++){
+                if(targetHead<=heads[i] && targetHead>=heads[i+1]){
+                    return heads[i+1]===heads[i] ? flows[i] : flows[i] + ((flows[i+1]-flows[i])*(targetHead-heads[i])/(heads[i+1]-heads[i]));
+                }
+            }
+            return null;
+        }
+
+        function generateCurvePoints(pumpName,steps) {
+            const data=PUMP_DATA[pumpName]; const flows=data.flow, heads=data.head;
+            const maxFlow=Math.max(...flows); const pts=[];
+            for(let i=0;i<=steps;i++){
+                const f=(maxFlow/steps)*i;
+                for(let j=0;j<flows.length-1;j++){
+                    if(f>=flows[j] && f<=flows[j+1]){
+                        const h=heads[j]+((heads[j+1]-heads[j])*(f-flows[j])/(flows[j+1]-flows[j]));
+                        pts.push({x:parseFloat(f.toFixed(3)), y:parseFloat(h.toFixed(2))});
+                        break;
+                    }
+                }
+            }
+            return pts;
+        }
+
+        function selectPumpCard(pumpName, cardEl) {
+            document.querySelectorAll('.pump-model-card').forEach(c=>c.classList.remove('selected'));
+            cardEl.classList.add('selected');
+            state.selectedPump=pumpName;
+            drawPumpCurve(pumpName);
+            updatePumpInfoPanel(pumpName);
+        }
+
+        function drawPumpCurve(pumpName) {
+            if(!pumpName) return;
+            const wrapper=document.getElementById('pump-curve-canvas-wrapper');
+            const flowResult=document.getElementById('pump-flow-result');
+            const totalHead=(state.verticalHead||0)+(state.pipeHead||0)+(state.deliveryHead||0);
+            const data=PUMP_DATA[pumpName]; const maxHead=Math.max(...data.head), maxFlow=Math.max(...data.flow);
+            const curvePoints=generateCurvePoints(pumpName,120);
+            const headLinePoints=[{x:0,y:totalHead},{x:maxFlow,y:totalHead}];
+            const estFlow=getFlowAtHead(pumpName,totalHead);
+            const inter=estFlow!==null?[{x:parseFloat(estFlow.toFixed(2)),y:parseFloat(totalHead.toFixed(2))}]:[];
+            wrapper.style.display='block';
+            if(pumpChart){ pumpChart.destroy(); pumpChart=null; }
+            const ctx=document.getElementById('pumpCurveChart').getContext('2d');
+            pumpChart=new Chart(ctx,{
+                type:'scatter',
+                data:{
+                    datasets:[
+                        {label:'เส้นโค้ง',data:curvePoints,type:'line',borderColor:'#1B4D35',backgroundColor:'rgba(27,77,53,0.08)',borderWidth:3,fill:true,tension:0.35,pointRadius:0,order:3},
+                        {label:'Head ที่ต้องการ',data:headLinePoints,type:'line',borderColor:'#E07A2F',borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false,tension:0,order:2},
+                        {label:'จุดทำงาน',data:inter,type:'scatter',backgroundColor:'#F5C842',borderColor:'#1B4D35',borderWidth:2,pointRadius:8,order:1}
+                    ]
+                },
+                options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`อัตราไหล: ${ctx.parsed.x.toFixed(2)} ม³/ชม.  | Head: ${ctx.parsed.y.toFixed(1)} ม.`}}},scales:{x:{title:{display:true,text:'อัตราไหล (ม³/ชม.)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},y:{title:{display:true,text:'Head (เมตร)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}}}}
+            });
+            flowResult.style.display='block';
+            if(estFlow!==null){
+                flowResult.className='pump-flow-result ok';
+                flowResult.innerHTML=`✅ อัตราไหลที่ Head ${totalHead.toFixed(1)} ม. <span class="flow-num">${estFlow.toFixed(2)} ม³/ชม.</span> ≈ ${((estFlow*1000)/60).toFixed(0)} ลิตร/นาที`;
+                state.pumpFlow=estFlow;
+                document.getElementById('zone-calc-section').style.display='block';
+                calcDripperZone(); calcSprinklerZone();
+            } else {
+                flowResult.className='pump-flow-result warn';
+                flowResult.innerHTML=`⚠️ Head ${totalHead.toFixed(1)} ม. สูงเกินขีดจำกัด (Max ${maxHead.toFixed(0)} ม.)`;
+                document.getElementById('zone-calc-section').style.display='none';
+            }
+        }
+
+        function updatePumpInfoPanel(pumpName) {
+            const data=PUMP_DATA[pumpName]; if(!data) return;
+            document.getElementById('pump-info-img').src=data.image;
+            document.getElementById('pump-info-name').textContent=pumpName;
+            const badge=document.getElementById('pump-info-type-badge');
+            const label=data.type==='borehole'?'🔩 ปั๊มบาดาล':'⚙️ ปั๊มหอยโข่ง';
+            badge.innerHTML=`<span style="display:inline-block;padding:2px 10px;border-radius:99px;background:var(--green-light);color:var(--green-dark);font-size:12px;font-weight:700;">${label}</span> <span style="display:inline-block;padding:2px 10px;border-radius:99px;background:#fff7e0;color:#b8860b;font-size:12px;font-weight:700;">฿${Number(data.price).toLocaleString()} บาท</span>`;
+            const parts=data.parts||[];
+            const grid=document.getElementById('pump-parts-grid');
+            grid.innerHTML=parts.map(p=>`<div class="part-item"><div class="part-item-code">${p.code}</div><div>${p.label} ${p.qty} ${p.unit}</div></div>`).join('');
+            const total=parts.reduce((s,p)=>s+(p.price*p.qty),0);
+            document.getElementById('pump-parts-total').textContent=total>0?'฿'+total.toLocaleString():'฿'+Number(data.price).toLocaleString();
+            document.getElementById('pump-info-panel').style.display='block';
+        }
+
+        function switchZoneTab(tab, btn) {
+            document.querySelectorAll('.zone-tab').forEach(t=>t.classList.remove('active'));
+            document.querySelectorAll('.zone-tab-content').forEach(t=>t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('zone-tab-'+tab).classList.add('active');
+        }
+
+        function calcDripperZone() {
+            const flow=state.pumpFlow||0; const raiPerPump=flow/6;
+            const res=document.getElementById('dripper-rai-result');
+            res.style.display='block';
+            res.innerHTML=`ปั๊มรองรับ <strong>${raiPerPump.toFixed(2)} ไร่</strong> ต่อรอบ`;
+            const total=parseFloat(document.getElementById('dripper-total-rai').value);
+            const box=document.getElementById('dripper-zone-result');
+            if(!total||total<=0||raiPerPump<=0){ box.style.display='none'; return; }
+            const zones=Math.ceil(total/raiPerPump);
+            box.style.display='block';
+            document.getElementById('dripper-zone-value').textContent=zones;
+            document.getElementById('dripper-zone-note').textContent=zones<=1?'✅ รองรับทั้งหมดในรอบเดียว':`แบ่ง ${zones} โซน`;
+        }
+
+        function calcSprinklerZone() {
+            const flow=state.pumpFlow||0;
+            const lph=parseFloat(document.getElementById('sprinkler-lph').value);
+            const cmsRes=document.getElementById('sprinkler-cms-result');
+            const headsRes=document.getElementById('sprinkler-heads-result');
+            const zoneBox=document.getElementById('sprinkler-zone-result');
+            if(!lph||lph<=0){ cmsRes.style.display='none'; headsRes.style.display='none'; zoneBox.style.display='none'; return; }
+            const flowPerHead=lph/1000;
+            cmsRes.style.display='block';
+            cmsRes.innerHTML=`${lph} L/H = <strong>${flowPerHead.toFixed(4)} คิว/ชม</strong> ต่อหัว`;
+            const headsPerPump=flowPerHead>0?Math.floor(flow/flowPerHead):0;
+            headsRes.style.display='block';
+            headsRes.innerHTML=`ปั๊มรองรับ <strong>${headsPerPump} หัว</strong> ต่อรอบ`;
+            const total=parseFloat(document.getElementById('sprinkler-total-heads').value);
+            if(!total||total<=0||headsPerPump<=0){ zoneBox.style.display='none'; return; }
+            const zones=Math.ceil(total/headsPerPump);
+            zoneBox.style.display='block';
+            document.getElementById('sprinkler-zone-value').textContent=zones;
+            document.getElementById('sprinkler-zone-note').textContent=zones<=1?'✅ รองรับทั้งหมดในรอบเดียว':`แบ่ง ${zones} โซน`;
+        }
+
+        // init
+        document.addEventListener('DOMContentLoaded', ()=>{ selectPumpType('borehole'); });
+    </script>
+</body>
+</html>
