@@ -1700,6 +1700,30 @@ footer a:hover {
   line-height: 1.6;
 }
 
+  /* === PIPE LENGTH EQUATION — keep on one line === */
+  #pipe-length-eq {
+    font-size: 12.5px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.2px;
+  }
+
+  /* === PIPE HEAD FORMULA — keep on one line === */
+  #pipe-head-formula {
+    padding: 12px 14px;
+  }
+
+  #pipe-head-formula strong {
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    letter-spacing: -0.2px;
+  }
+}
+
 @media (max-width: 600px) {
   .pump-info-body {
     flex-direction: column;
