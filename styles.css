@@ -1541,8 +1541,19 @@ footer a:hover {
   animation: fadeIn 0.3s ease;
 }
 
+.formula-pill-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin: 8px 0 16px;
+}
+
+.formula-pill-wrap::-webkit-scrollbar {
+  display: none;
+}
+
 .formula-pill {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   background: var(--green-light);
@@ -1553,32 +1564,20 @@ footer a:hover {
   font-weight: 700;
   color: var(--green-dark);
   margin: 8px 0 16px;
-  /* Keep all tokens on one line — no wrapping ever */
+  /* Force pill to its natural full width so wrapper can scroll it */
+  width: max-content;
   flex-wrap: nowrap;
   white-space: nowrap;
+}
+
+/* When inside a scroll wrapper, pill fills naturally and wrapper scrolls */
+.formula-pill-wrap > .formula-pill {
+  margin: 0;
 }
 
 .formula-pill > span {
   white-space: nowrap;
   flex-shrink: 0;
-}
-
-/* Scroll wrapper sits OUTSIDE the pill so border-radius isn't clipped */
-.formula-pill-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  /* Negative margin trick keeps the pill's outer margin correct */
-  margin: 8px 0 16px;
-}
-
-.formula-pill-wrap::-webkit-scrollbar {
-  display: none;
-}
-
-/* When inside a wrap, reset the pill's own margin */
-.formula-pill-wrap > .formula-pill {
-  margin: 0;
 }
 
 .zone-result-box {
