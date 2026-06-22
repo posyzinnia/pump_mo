@@ -503,7 +503,9 @@
             border-radius: var(--radius);
             background: #fff;
             padding: 14px;
+            display: none; /* hidden by default, shown when card clicked */
         }
+        .pump-info-panel.visible { display: block; animation: fade 0.3s; }
         .pump-info-img { max-width: 100%; height: auto; border-radius: 8px; }
         .pump-info-name { font-size: 16px; font-weight: 800; color: var(--green-dark); }
         .pump-parts-grid {
@@ -554,7 +556,6 @@
             color: var(--green-dark);
             flex-wrap: wrap;
         }
-        /* keep total head line inline */
         .total-head-line {
             display: flex;
             flex-wrap: nowrap;
@@ -575,6 +576,8 @@
             border-radius: 20px;
         }
         .total-head-line .th-plus { flex-shrink: 0; opacity: 0.5; }
+        /* ensure pump info panel is visible when linked */
+        .pump-info-panel.linked { display: block; }
     </style>
 </head>
 <body>
@@ -605,7 +608,6 @@
             </div>
             <div class="card">
                 <div class="card-title"><span class="tag tag-blue">สูตรรวม</span> Head ทั้งหมด = 3 ส่วน</div>
-                <!-- Total head line kept inline -->
                 <div class="total-head-line">
                     <span class="th-item" style="background:#e8f4ec;color:#1b4d35;">Head แนวดิ่ง</span>
                     <span class="th-plus">+</span>
@@ -761,7 +763,6 @@
             <!-- TOTAL -->
             <div class="card" style="border:2px solid var(--gold);background:linear-gradient(135deg,#FFFBE6,#FFF8CC);">
                 <div class="card-title"><i class="fas fa-crown" style="color:var(--gold);"></i> Head ทั้งหมด</div>
-                <!-- Keep total head line inline -->
                 <div class="total-head-line" style="justify-content:center;margin-bottom:12px;font-size:14px;">
                     <span class="th-item" style="background:#e8f4ec;color:#1b4d35;">แนวตั้ง</span>
                     <span class="th-plus">+</span>
@@ -823,7 +824,7 @@
                         <div id="sprinkler-zone-result" class="zone-result-box" style="display:none;"><div class="z-label">จำนวนโซน</div><div class="z-value" id="sprinkler-zone-value">—</div><div class="z-note" id="sprinkler-zone-note"></div></div>
                     </div>
                 </div>
-                <!-- Pump info panel -->
+                <!-- Pump info panel - now visible when card is clicked -->
                 <div id="pump-info-panel" class="pump-info-panel" style="display:none;margin-top:14px;">
                     <div style="display:flex;flex-direction:column;gap:10px;">
                         <img id="pump-info-img" src="" alt="pump" style="max-width:100%;border-radius:8px;">
@@ -929,6 +930,7 @@
             const grid=document.getElementById('pump-cards-grid'); grid.innerHTML='';
             document.getElementById('pump-curve-canvas-wrapper').style.display='none';
             document.getElementById('pump-flow-result').style.display='none';
+            // Hide pump info panel initially
             document.getElementById('pump-info-panel').style.display='none';
             if(pumpChart){ pumpChart.destroy(); pumpChart=null; }
             state.selectedPump=null;
@@ -994,6 +996,13 @@
             state.selectedPump=pumpName;
             drawPumpCurve(pumpName);
             updatePumpInfoPanel(pumpName);
+            // Scroll to pump info panel smoothly
+            setTimeout(() => {
+                const panel = document.getElementById('pump-info-panel');
+                if (panel) {
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 200);
         }
 
         function drawPumpCurve(pumpName) {
@@ -1046,7 +1055,10 @@
             grid.innerHTML=parts.map(p=>`<div class="part-item"><div class="part-item-code">${p.code}</div><div>${p.label} ${p.qty} ${p.unit}</div></div>`).join('');
             const total=parts.reduce((s,p)=>s+(p.price*p.qty),0);
             document.getElementById('pump-parts-total').textContent=total>0?'฿'+total.toLocaleString():'฿'+Number(data.price).toLocaleString();
-            document.getElementById('pump-info-panel').style.display='block';
+            // Show the panel
+            const panel = document.getElementById('pump-info-panel');
+            panel.style.display = 'block';
+            panel.classList.add('visible');
         }
 
         function switchZoneTab(tab, btn) {
