@@ -340,6 +340,53 @@ select:focus {
   padding: 20px 24px;
   margin: 16px 0;
   font-size: 16px;
+  /* Horizontal scroll when formula is too wide */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(27,77,53,0.2) transparent;
+}
+
+.formula-box::-webkit-scrollbar {
+  height: 4px;
+}
+
+.formula-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.formula-box::-webkit-scrollbar-thumb {
+  background: rgba(27,77,53,0.25);
+  border-radius: 4px;
+}
+
+/* Scroll-hint wrapper — reveals a fade when content overflows */
+.formula-box-wrap {
+  position: relative;
+}
+
+.formula-box-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 100%;
+  pointer-events: none;
+  border-radius: 0 12px 12px 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.formula-box-wrap.green::after  { background: linear-gradient(to right, transparent, var(--green-light)); }
+.formula-box-wrap.orange::after { background: linear-gradient(to right, transparent, #fef0e6); }
+.formula-box-wrap.purple::after { background: linear-gradient(to right, transparent, var(--purple-light)); }
+.formula-box-wrap.gold::after   { background: linear-gradient(to right, transparent, #fffbe6); }
+
+@media (max-width: 768px) {
+  .formula-box-wrap::after {
+    opacity: 1;
+  }
 }
 
 .formula-box.green {
@@ -364,6 +411,7 @@ select:focus {
 
 .formula-box strong {
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .formula-line {
@@ -372,7 +420,9 @@ select:focus {
   gap: 10px;
   font-size: 15px;
   margin: 6px 0;
-  flex-wrap: wrap;
+  /* Never wrap — scroll the box instead */
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .fval {
@@ -773,19 +823,15 @@ footer a:hover {
     margin-bottom: 0;
   }
 
-  /* === FORMULA LINE — prevent overflow === */
-  .formula-line {
-    flex-wrap: wrap;
-    gap: 6px;
+  /* === FORMULA BOX — mobile padding only, scrolling handled globally === */
+  .formula-box {
+    padding: 12px 16px;
     font-size: 14px;
-    line-height: 1.6;
   }
 
-  .formula-box {
-    padding: 14px 16px;
+  .formula-line {
     font-size: 14px;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    gap: 8px;
   }
 
   .fval {

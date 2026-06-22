@@ -76,8 +76,9 @@
                         <div class="pre-part-label">Head จากรูปแบบจ่ายน้ำ</div>                    </div>
                 </div>
 
+                <div class="formula-box-wrap green">
                 <div class="formula-box green" style="margin-top: 20px;">
-                    <div class="formula-line" style="font-size: 16px; flex-wrap: wrap; gap: 8px;">
+                    <div class="formula-line" style="font-size: 16px; gap: 8px;">
                         <strong>Head รวม</strong>
                         <span style="opacity:0.5">=</span>
                         <span style="color: var(--green-dark); font-weight: 700;">Head แนวดิ่ง</span>
@@ -86,6 +87,7 @@
                         <span style="opacity:0.5">+</span>
                         <span style="color: var(--purple); font-weight: 700;">Head การจ่ายน้ำ</span>
                     </div>
+                </div>
                 </div>
             </div>
 
@@ -158,10 +160,12 @@
                         สูตรคำนวณ Head ระยะส่งในแนวดิ่ง
                     </div>
 
+                    <div class="formula-box-wrap green">
                     <div class="formula-box green">
                         <div class="formula-line">
                             <strong>Head = <span style="color: red">ระยะสูบน้ำ (20 เมตร)</span> + <span style="color: blue">ระดับน้ำปากบ่อ</span> + ความสูงในการส่งน้ำจากระดับพื้นดิน</strong>
                         </div>
+                    </div>
                     </div>
 
                     <div class="steps">
@@ -248,10 +252,12 @@
                         สูตรคำนวณ Head ระยะส่งในแนวดิ่ง
                     </div>
 
+                    <div class="formula-box-wrap green">
                     <div class="formula-box green">
                         <div class="formula-line">
                             <strong>Head = <span style="color: blue">ระดับน้ำปากบ่อ</span> + ความสูงในการส่งน้ำ</strong>
                         </div>
+                    </div>
                     </div>
 
                     <div class="steps">
@@ -341,12 +347,14 @@
             </div>
 
             <div class="card">
-                <p id="pipe-length-eq" style="margin-bottom: 16px; color: var(--text-muted); font-size: 15px;">
+                <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 15px;">
                     <strong>ความยาวท่อ</strong> = ระยะท่อในแนวดิ่ง + ระยะท่อในแนวนอน + ระยะท่อในแนวเอียง
                 </p>
 
-                <div class="formula-box orange" id="pipe-head-formula">
+                <div class="formula-box-wrap orange">
+                <div class="formula-box orange">
                     <strong>Head จากความยาวท่อ = ความยาวท่อทั้งหมด ÷ ค่าคงที่ (ขึ้นกับขนาดท่อ)</strong>
+                </div>
                 </div>
 
                 <div class="data-table-wrapper">
@@ -550,10 +558,12 @@
                             <div class="result-value" id="bore-result-value">0</div>
                             <div class="result-unit">เมตร</div>
                         </div>
+                        <div class="formula-box-wrap green">
                         <div class="formula-box green" style="margin-top: 16px;">
                             <div class="formula-line">
                                 <span class="fval" id="bore-calc-show"></span>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -591,10 +601,12 @@
                             <div class="result-value" id="cent-result-value">0</div>
                             <div class="result-unit">เมตร</div>
                         </div>
+                        <div class="formula-box-wrap green">
                         <div class="formula-box green" style="margin-top: 16px;">
                             <div class="formula-line">
                                 <span class="fval" id="cent-calc-show"></span>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -637,10 +649,12 @@
                         <div class="result-value" id="pipe-result-value">0</div>
                         <div class="result-unit">เมตร</div>
                     </div>
+                    <div class="formula-box-wrap orange">
                     <div class="formula-box orange" style="margin-top: 16px;">
                         <div class="formula-line">
                             <span class="fval orange" id="pipe-calc-show"></span>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -682,10 +696,12 @@
                         <div class="result-value" id="delivery-result-value">0</div>
                         <div class="result-unit">เมตร</div>
                     </div>
+                    <div class="formula-box-wrap purple">
                     <div class="formula-box purple" style="margin-top: 16px;">
                         <div class="formula-line">
                             <span class="fval purple" id="delivery-calc-show"></span>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
