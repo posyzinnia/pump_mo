@@ -363,6 +363,8 @@ select:focus {
 /* Scroll-hint wrapper — reveals a fade when content overflows */
 .formula-box-wrap {
   position: relative;
+  /* Prevent flex/grid parents from squeezing this below its scroll content */
+  min-width: 0;
 }
 
 .formula-box-wrap::after {
@@ -830,6 +832,19 @@ footer a:hover {
     font-size: 14px;
   }
 
+  /*
+   * SCROLL BLEED FIX for formula-box-wrap: same negative-margin trick
+   * as formula-pill-wrap. Card padding is 16px on mobile.
+   */
+  .formula-box-wrap {
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+  .formula-box-wrap > .formula-box {
+    border-radius: 0;
+    border-left-width: 4px;
+  }
+
   .formula-line {
     font-size: 14px;
     gap: 8px;
@@ -1015,6 +1030,11 @@ footer a:hover {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     gap: 4px;
+    /* Bleed to section edges so tab buttons aren't clipped */
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .zone-tabs::-webkit-scrollbar {
@@ -1110,6 +1130,19 @@ footer a:hover {
   .formula-pill {
     font-size: 13px;
     padding: 5px 12px;
+  }
+
+  /*
+   * SCROLL BLEED FIX: pull scroll wrappers to the card/section edges
+   * so the scrolled pill isn't clipped by the parent's padding.
+   * The padding-left/right compensates so content starts at the same indent.
+   * Card padding = 16px, zone-calc-section padding = 16px (mobile override).
+   */
+  .formula-pill-wrap {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   /* === COPY BUTTON === */
@@ -1499,8 +1532,10 @@ footer a:hover {
   color: var(--green-dark);
   margin-bottom: 16px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  flex-wrap: wrap;
+  line-height: 1.4;
 }
 
 .zone-tabs {
@@ -1543,53 +1578,22 @@ footer a:hover {
 }
 
 .formula-pill-wrap {
-  position: relative;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   margin: 8px 0 16px;
-  /* Ensure wrapper is bounded by its parent so pill can overflow + scroll */
-  width: 100%;
-  max-width: 100%;
-  /* Small bottom padding so the pill border isn't clipped */
-  padding-bottom: 2px;
+  /* Ensure the scroll container itself can shrink inside flex/grid parents */
+  min-width: 0;
+  /* Add right padding so the pill's far edge isn't flush-clipped when scrolled */
+  padding-right: 1px;
 }
 
 .formula-pill-wrap::-webkit-scrollbar {
   display: none;
 }
 
-/* Right-edge fade hint — signals there's more content to scroll */
-.formula-pill-wrap::after {
-  content: "";
-  position: sticky;
-  right: 0;
-  top: 0;
-  display: block;
-  width: 40px;
-  height: 100%;
-  flex-shrink: 0;
-  pointer-events: none;
-  /* Fade colour matches the default green pill; overridden per-colour below */
-  background: linear-gradient(to right, transparent, var(--green-light, #e8f5ee));
-  border-radius: 0 99px 99px 0;
-  /* Only show on narrow viewports where clipping is likely */
-  opacity: 0;
-}
-
-@media (max-width: 768px) {
-  .formula-pill-wrap::after {
-    opacity: 1;
-  }
-}
-
-/* Colour-matched fade hints for orange / other pill variants */
-.formula-pill-wrap.orange::after {
-  background: linear-gradient(to right, transparent, #fef0e6);
-}
-
 .formula-pill {
-  display: inline-flex;          /* inline-flex so width is driven by content */
+  display: flex;
   align-items: center;
   gap: 8px;
   background: var(--green-light);
@@ -1602,7 +1606,6 @@ footer a:hover {
   margin: 8px 0 16px;
   /* Force pill to its natural full width so wrapper can scroll it */
   width: max-content;
-  min-width: max-content;        /* prevent compression in any flex context */
   flex-wrap: nowrap;
   white-space: nowrap;
 }
@@ -1610,8 +1613,6 @@ footer a:hover {
 /* When inside a scroll wrapper, pill fills naturally and wrapper scrolls */
 .formula-pill-wrap > .formula-pill {
   margin: 0;
-  /* Right padding creates breathing room before the fade hint edge */
-  padding-right: 20px;
 }
 
 .formula-pill > span {
