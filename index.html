@@ -801,10 +801,12 @@
 
                         <div class="zone-step-label">ขั้นที่ 1 — จำนวนไร่ที่ปั๊มทำงานได้</div>
                         
+                        <div class="formula-pill-wrap">
                         <div class="formula-pill">
                             <span>จำนวนไร่ที่ปั๊มทำงานได้</span>
                             <span style="opacity:0.5">=</span>
                             <span>อัตราการไหล (คิว/ชม) ÷ 6</span>
+                        </div>
                         </div>
                         <div class="zone-inline-result" id="dripper-rai-result"></div>
 
@@ -813,11 +815,12 @@
                             <strong>หน่วยพื้นที่ที่ใช้คำนวณ</strong><br>
                             1 ไร่ = 4 งาน = 400 ตารางวา = 1,600 ตารางเมตร
                         </div>
-                        <div class="zone-step-label" style="margin-top:18px;">ขั้นที่ 2 — แบ่งโซน (ถ้าพื้นที่รวมมากกว่าขั้นที่ 1)</div>
+                        <div class="formula-pill-wrap">
                         <div class="formula-pill" style="background:#FEF0E6;border-color:var(--orange);color:var(--orange);">
                             <span>จำนวนโซน</span>
                             <span style="opacity:0.5">=</span>
                             <span>จำนวนไร่ทั้งหมด ÷ จำนวนไร่ที่ปั๊มทำงานได้</span>
+                        </div>
                         </div>
 
                         <div class="input-group" style="margin-top:8px;">
@@ -839,10 +842,12 @@
                     <!-- SPRINKLER TAB -->
                     <div id="zone-tab-sprinkler" class="zone-tab-content">
                         <div class="zone-step-label">ขั้นที่ 1 — แปลงหน่วยปริมาณน้ำต่อหัว (L/H → คิว/ชม)</div>
+                        <div class="formula-pill-wrap">
                         <div class="formula-pill">
                             <span>คิว/ชม</span>
                             <span style="opacity:0.5">=</span>
                             <span>ปริมาณน้ำต่อหัว (L/H) ÷ 1000</span>
+                        </div>
                         </div>
 
                         <div class="input-group" style="margin-top:4px;">
@@ -855,18 +860,22 @@
                         <div class="zone-inline-result" id="sprinkler-cms-result"></div>
 
                         <div class="zone-step-label" style="margin-top:18px;">ขั้นที่ 2 — จำนวนหัวที่ปั๊มทำงานได้</div>
+                        <div class="formula-pill-wrap">
                         <div class="formula-pill">
                             <span>จำนวนหัวที่ปั๊มทำงานได้</span>
                             <span style="opacity:0.5">=</span>
                             <span>อัตราการไหล ÷ ปริมาณน้ำต่อหัว (คิว/ชม)</span>
                         </div>
+                        </div>
                         <div class="zone-inline-result" id="sprinkler-heads-result"></div>
 
                         <div class="zone-step-label" style="margin-top:18px;">ขั้นที่ 3 — แบ่งโซน (ถ้าหัวทั้งหมดมากกว่าขั้นที่ 2)</div>
+                        <div class="formula-pill-wrap">
                         <div class="formula-pill" style="background:#FEF0E6;border-color:var(--orange);color:var(--orange);">
                             <span>จำนวนโซน</span>
                             <span style="opacity:0.5">=</span>
                             <span>จำนวนหัวทั้งหมด ÷ จำนวนหัวที่ปั๊มทำงานได้</span>
+                        </div>
                         </div>
 
                         <div class="input-group" style="margin-top:8px;">
