@@ -411,6 +411,7 @@ select:focus {
 
 .formula-box strong {
   font-weight: 700;
+  display: block;
   white-space: nowrap;
 }
 
