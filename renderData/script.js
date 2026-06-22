@@ -657,3 +657,260 @@ function calcSprinklerZone() {
     zoneNote.textContent = `แบ่งเป็น ${zonesRounded} โซน — โซนละ ~${Math.ceil(totalHeads / zonesRounded)} หัวต่อรอบ เพื่อประสิทธิภาพสูงสุด`;
   }
 }
+let state = { pumpType: "borehole", verticalHead: 0, pipeHead: 0, deliveryHead: 0, deliveryType: "", selectedPump: null, pumpFlow: 0 };
+        let pumpChart = null;
+
+        function switchPump(type, btn) {
+            document.querySelectorAll('.pump-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.pump-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('pump-'+type).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function selectPumpType(type) {
+            state.pumpType = type;
+            const b = document.getElementById('btn-borehole'), c = document.getElementById('btn-centrifugal');
+            if(type==='borehole') {
+                b.className='btn btn-primary'; c.className='btn btn-secondary';
+                document.getElementById('calc-borehole').style.display='block';
+                document.getElementById('calc-centrifugal').style.display='none';
+            } else {
+                c.className='btn btn-primary'; b.className='btn btn-secondary';
+                document.getElementById('calc-centrifugal').style.display='block';
+                document.getElementById('calc-borehole').style.display='none';
+            }
+        }
+
+        function calculateBorehead() {
+            const d=parseFloat(document.getElementById('bore-depth').value)||0;
+            const w=parseFloat(document.getElementById('bore-water-level').value)||0;
+            const h=parseFloat(document.getElementById('bore-delivery-height').value)||0;
+            const head=d+w+h; state.verticalHead=head;
+            document.getElementById('bore-result').style.display='block';
+            document.getElementById('bore-result-value').textContent=head.toFixed(2);
+        }
+
+        function calculateCenthead() {
+            const s=parseFloat(document.getElementById('cent-suction-depth').value)||0;
+            const h=parseFloat(document.getElementById('cent-delivery-height').value)||0;
+            const head=s+h; state.verticalHead=head;
+            document.getElementById('cent-result').style.display='block';
+            document.getElementById('cent-result-value').textContent=head.toFixed(2);
+        }
+
+        function calculatePipeHead() {
+            const len=parseFloat(document.getElementById('pipe-length').value)||0;
+            const sz=document.getElementById('pipe-size').value;
+            if(!sz){alert('เลือกขนาดท่อ');return;}
+            const divs={1.5:15,2:20,3:30,4:40};
+            const head=len/divs[sz]; state.pipeHead=head;
+            document.getElementById('pipe-result').style.display='block';
+            document.getElementById('pipe-result-value').textContent=head.toFixed(2);
+        }
+
+        function updateDeliveryHead() {
+            const type=document.getElementById('delivery-type').value;
+            state.deliveryType=type;
+            if(type==='0'){ state.deliveryHead=0; document.getElementById('pressure-input').style.display='none'; document.getElementById('delivery-result').style.display='none'; }
+            else if(type==='manual'||type==='sprinkler'){ document.getElementById('pressure-input').style.display='block'; document.getElementById('delivery-result').style.display='none'; }
+        }
+
+        function calculateDeliveryHead() {
+            const p=parseFloat(document.getElementById('delivery-pressure').value)||0;
+            const head=p*10; state.deliveryHead=head;
+            document.getElementById('delivery-result').style.display='block';
+            document.getElementById('delivery-result-value').textContent=head.toFixed(2);
+        }
+
+        function calculateTotalHead() {
+            const vert=state.verticalHead||0, pipe=state.pipeHead||0, deliv=state.deliveryHead||0;
+            const total=vert+pipe+deliv, rec=(total*1.43).toFixed(2);
+            document.getElementById('total-result').style.display='block';
+            document.getElementById('summary-vertical').textContent=vert.toFixed(2)+' ม.';
+            document.getElementById('summary-pipe').textContent=pipe.toFixed(2)+' ม.';
+            document.getElementById('summary-delivery').textContent=deliv.toFixed(2)+' ม.';
+            document.getElementById('summary-total').textContent=total.toFixed(2);
+            document.getElementById('recommended-head').textContent=rec;
+            renderPumpCards(total);
+            document.getElementById('pump-select-card').style.display='block';
+        }
+
+        function renderPumpCards(totalHead) {
+            const grid=document.getElementById('pump-cards-grid'); grid.innerHTML='';
+            document.getElementById('pump-curve-canvas-wrapper').style.display='none';
+            document.getElementById('pump-flow-result').style.display='none';
+            // Hide pump info panel initially
+            document.getElementById('pump-info-panel').style.display='none';
+            if(pumpChart){ pumpChart.destroy(); pumpChart=null; }
+            state.selectedPump=null;
+            const activeType=state.pumpType;
+            let count=0;
+            if(typeof PUMP_DATA==='undefined'){ grid.innerHTML='<p>กรุณาโหลดข้อมูลปั๊ม</p>'; return; }
+            Object.entries(PUMP_DATA).forEach(([name,data])=>{
+                if(data.type!==activeType) return;
+                const maxHead=Math.max(...data.head);
+                if(maxHead<totalHead) return;
+                const estFlow=getFlowAtHead(name,totalHead);
+                count++;
+                const card=document.createElement('div');
+                card.className='pump-model-card';
+                card.dataset.pump=name;
+                card.innerHTML=`
+                    <img class="pump-card-img" src="${data.image}" alt="${name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%2280%22%3E%3Crect fill=%22%23f5f9f6%22 width=%22100%25%22 height=%22100%25%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 text-anchor=%22middle%22 fill=%22%23aaa%22 font-size=%2211%22%3Eไม่พบรูป%3C/text%3E%3C/svg%3E'">
+                    <div class="pump-card-name">${name}</div>
+                    <div class="pump-card-stat"><span>รหัส</span><strong>${data.power}</strong></div>
+                    <div class="pump-card-stat"><span>ท่อ</span><strong>${data.po}</strong></div>
+                    <div class="pump-card-flow-badge">≈ ${estFlow!==null?estFlow.toFixed(2)+' คิว/ชม':'-'}</div>
+                    <div class="pump-card-flow-badge-orange">${Number(data.price).toLocaleString()} บาท</div>
+                `;
+                card.addEventListener('click',()=>selectPumpCard(name,card));
+                grid.appendChild(card);
+            });
+            if(count===0) grid.innerHTML='<p style="color:var(--orange);font-weight:700;font-size:14px;">⚠️ ไม่มีปั๊มที่รองรับ Head '+totalHead.toFixed(1)+' ม.</p>';
+        }
+
+        function getFlowAtHead(pumpName,targetHead) {
+            const data=PUMP_DATA[pumpName]; if(!data) return null;
+            const heads=data.head, flows=data.flow;
+            const maxHead=Math.max(...heads);
+            if(targetHead>maxHead) return null;
+            if(targetHead<=0) return Math.max(...flows);
+            for(let i=0;i<heads.length-1;i++){
+                if(targetHead<=heads[i] && targetHead>=heads[i+1]){
+                    return heads[i+1]===heads[i] ? flows[i] : flows[i] + ((flows[i+1]-flows[i])*(targetHead-heads[i])/(heads[i+1]-heads[i]));
+                }
+            }
+            return null;
+        }
+
+        function generateCurvePoints(pumpName,steps) {
+            const data=PUMP_DATA[pumpName]; const flows=data.flow, heads=data.head;
+            const maxFlow=Math.max(...flows); const pts=[];
+            for(let i=0;i<=steps;i++){
+                const f=(maxFlow/steps)*i;
+                for(let j=0;j<flows.length-1;j++){
+                    if(f>=flows[j] && f<=flows[j+1]){
+                        const h=heads[j]+((heads[j+1]-heads[j])*(f-flows[j])/(flows[j+1]-flows[j]));
+                        pts.push({x:parseFloat(f.toFixed(3)), y:parseFloat(h.toFixed(2))});
+                        break;
+                    }
+                }
+            }
+            return pts;
+        }
+
+        function selectPumpCard(pumpName, cardEl) {
+            document.querySelectorAll('.pump-model-card').forEach(c=>c.classList.remove('selected'));
+            cardEl.classList.add('selected');
+            state.selectedPump=pumpName;
+            drawPumpCurve(pumpName);
+            updatePumpInfoPanel(pumpName);
+            // Scroll to pump info panel smoothly
+            setTimeout(() => {
+                const panel = document.getElementById('pump-info-panel');
+                if (panel) {
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 200);
+        }
+
+        function drawPumpCurve(pumpName) {
+            if(!pumpName) return;
+            const wrapper=document.getElementById('pump-curve-canvas-wrapper');
+            const flowResult=document.getElementById('pump-flow-result');
+            const totalHead=(state.verticalHead||0)+(state.pipeHead||0)+(state.deliveryHead||0);
+            const data=PUMP_DATA[pumpName]; const maxHead=Math.max(...data.head), maxFlow=Math.max(...data.flow);
+            const curvePoints=generateCurvePoints(pumpName,120);
+            const headLinePoints=[{x:0,y:totalHead},{x:maxFlow,y:totalHead}];
+            const estFlow=getFlowAtHead(pumpName,totalHead);
+            const inter=estFlow!==null?[{x:parseFloat(estFlow.toFixed(2)),y:parseFloat(totalHead.toFixed(2))}]:[];
+            wrapper.style.display='block';
+            if(pumpChart){ pumpChart.destroy(); pumpChart=null; }
+            const ctx=document.getElementById('pumpCurveChart').getContext('2d');
+            pumpChart=new Chart(ctx,{
+                type:'scatter',
+                data:{
+                    datasets:[
+                        {label:'เส้นโค้ง',data:curvePoints,type:'line',borderColor:'#1B4D35',backgroundColor:'rgba(27,77,53,0.08)',borderWidth:3,fill:true,tension:0.35,pointRadius:0,order:3},
+                        {label:'Head ที่ต้องการ',data:headLinePoints,type:'line',borderColor:'#E07A2F',borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false,tension:0,order:2},
+                        {label:'จุดทำงาน',data:inter,type:'scatter',backgroundColor:'#F5C842',borderColor:'#1B4D35',borderWidth:2,pointRadius:8,order:1}
+                    ]
+                },
+                options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`อัตราไหล: ${ctx.parsed.x.toFixed(2)} ม³/ชม.  | Head: ${ctx.parsed.y.toFixed(1)} ม.`}}},scales:{x:{title:{display:true,text:'อัตราไหล (ม³/ชม.)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},y:{title:{display:true,text:'Head (เมตร)',font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}}}}
+            });
+            flowResult.style.display='block';
+            if(estFlow!==null){
+                flowResult.className='pump-flow-result ok';
+                flowResult.innerHTML=`✅ อัตราไหลที่ Head ${totalHead.toFixed(1)} ม. <span class="flow-num">${estFlow.toFixed(2)} ม³/ชม.</span> ≈ ${((estFlow*1000)/60).toFixed(0)} ลิตร/นาที`;
+                state.pumpFlow=estFlow;
+                document.getElementById('zone-calc-section').style.display='block';
+                calcDripperZone(); calcSprinklerZone();
+            } else {
+                flowResult.className='pump-flow-result warn';
+                flowResult.innerHTML=`⚠️ Head ${totalHead.toFixed(1)} ม. สูงเกินขีดจำกัด (Max ${maxHead.toFixed(0)} ม.)`;
+                document.getElementById('zone-calc-section').style.display='none';
+            }
+        }
+
+        function updatePumpInfoPanel(pumpName) {
+            const data=PUMP_DATA[pumpName]; if(!data) return;
+            document.getElementById('pump-info-img').src=data.image;
+            document.getElementById('pump-info-name').textContent=pumpName;
+            const badge=document.getElementById('pump-info-type-badge');
+            const label=data.type==='borehole'?'🔩 ปั๊มบาดาล':'⚙️ ปั๊มหอยโข่ง';
+            badge.innerHTML=`<span style="display:inline-block;padding:2px 10px;border-radius:99px;background:var(--green-light);color:var(--green-dark);font-size:12px;font-weight:700;">${label}</span> <span style="display:inline-block;padding:2px 10px;border-radius:99px;background:#fff7e0;color:#b8860b;font-size:12px;font-weight:700;">฿${Number(data.price).toLocaleString()} บาท</span>`;
+            const parts=data.parts||[];
+            const grid=document.getElementById('pump-parts-grid');
+            grid.innerHTML=parts.map(p=>`<div class="part-item"><div class="part-item-code">${p.code}</div><div>${p.label} ${p.qty} ${p.unit}</div></div>`).join('');
+            const total=parts.reduce((s,p)=>s+(p.price*p.qty),0);
+            document.getElementById('pump-parts-total').textContent=total>0?'฿'+total.toLocaleString():'฿'+Number(data.price).toLocaleString();
+            // Show the panel
+            const panel = document.getElementById('pump-info-panel');
+            panel.style.display = 'block';
+            panel.classList.add('visible');
+        }
+
+        function switchZoneTab(tab, btn) {
+            document.querySelectorAll('.zone-tab').forEach(t=>t.classList.remove('active'));
+            document.querySelectorAll('.zone-tab-content').forEach(t=>t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('zone-tab-'+tab).classList.add('active');
+        }
+
+        function calcDripperZone() {
+            const flow=state.pumpFlow||0; const raiPerPump=flow/6;
+            const res=document.getElementById('dripper-rai-result');
+            res.style.display='block';
+            res.innerHTML=`ปั๊มรองรับ <strong>${raiPerPump.toFixed(2)} ไร่</strong> ต่อรอบ`;
+            const total=parseFloat(document.getElementById('dripper-total-rai').value);
+            const box=document.getElementById('dripper-zone-result');
+            if(!total||total<=0||raiPerPump<=0){ box.style.display='none'; return; }
+            const zones=Math.ceil(total/raiPerPump);
+            box.style.display='block';
+            document.getElementById('dripper-zone-value').textContent=zones;
+            document.getElementById('dripper-zone-note').textContent=zones<=1?'✅ รองรับทั้งหมดในรอบเดียว':`แบ่ง ${zones} โซน`;
+        }
+
+        function calcSprinklerZone() {
+            const flow=state.pumpFlow||0;
+            const lph=parseFloat(document.getElementById('sprinkler-lph').value);
+            const cmsRes=document.getElementById('sprinkler-cms-result');
+            const headsRes=document.getElementById('sprinkler-heads-result');
+            const zoneBox=document.getElementById('sprinkler-zone-result');
+            if(!lph||lph<=0){ cmsRes.style.display='none'; headsRes.style.display='none'; zoneBox.style.display='none'; return; }
+            const flowPerHead=lph/1000;
+            cmsRes.style.display='block';
+            cmsRes.innerHTML=`${lph} L/H = <strong>${flowPerHead.toFixed(4)} คิว/ชม</strong> ต่อหัว`;
+            const headsPerPump=flowPerHead>0?Math.floor(flow/flowPerHead):0;
+            headsRes.style.display='block';
+            headsRes.innerHTML=`ปั๊มรองรับ <strong>${headsPerPump} หัว</strong> ต่อรอบ`;
+            const total=parseFloat(document.getElementById('sprinkler-total-heads').value);
+            if(!total||total<=0||headsPerPump<=0){ zoneBox.style.display='none'; return; }
+            const zones=Math.ceil(total/headsPerPump);
+            zoneBox.style.display='block';
+            document.getElementById('sprinkler-zone-value').textContent=zones;
+            document.getElementById('sprinkler-zone-note').textContent=zones<=1?'✅ รองรับทั้งหมดในรอบเดียว':`แบ่ง ${zones} โซน`;
+        }
+
+        // init
+        document.addEventListener('DOMContentLoaded', ()=>{ selectPumpType('borehole'); });
